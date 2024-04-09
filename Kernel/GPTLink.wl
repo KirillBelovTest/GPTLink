@@ -114,7 +114,7 @@ Module[{
 		"messages" -> messages, 
 		"temperature" -> temperature, 
 		If[Length[tools] > 0, "tools" -> Map[toolFunction] @ tools, Nothing], 
-		If[Length[tools] > 0, "tool_choice" -> toolChoice, Nothing]
+		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
 	|>, "RawJSON", CharacterEncoding -> "UTF-8"]; 
 	
 	request = HTTPRequest[url, <|
@@ -246,6 +246,22 @@ toolFunction[function_Symbol] :=
 
 toolFunction[assoc_Association?AssociationQ] := 
 assoc; 
+
+
+functionChoice[function_Symbol] := 
+<|"type" -> "function", "function" -> <|"name" -> SymbolName[function]|>|>; 
+
+
+functionChoice[Automatic | "auto"] := 
+"auto"; 
+
+
+functionChoice[assoc_Association?AssociationQ] := 
+assoc; 
+
+
+functionChoice[_] := 
+"none"; 
 
 
 (* ::Section:: *)
