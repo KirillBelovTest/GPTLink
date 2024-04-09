@@ -50,7 +50,8 @@ CreateType[GPTChatObject, {
 	"TotalTokens" -> 0, 
 	"Tools" -> {}, 
 	"ToolChoice" -> "auto", 
-	"Messages" -> {}
+	"Messages" -> {}, 
+	"Logger" -> None
 }]; 
 
 
@@ -76,7 +77,8 @@ Options[GPTChatCompleteAsync] = {
 	"Model" -> Automatic, 
 	"MaxTokens" -> Automatic, 
 	"Tools" -> Automatic, 
-	"ToolChoice" -> Automatic
+	"ToolChoice" -> Automatic, 
+	"Logger" -> Automatic
 }; 
 
 
@@ -94,9 +96,11 @@ Module[{
 	tools = ifAuto[OptionValue["Tools"], chat["Tools"]], 
 	toolChoice = ifAuto[OptionValue["ToolChoice"], chat["ToolChoice"]], 
 	maxTokens = ifAuto[OptionValue["MaxTokens"], chat["MaxTokens"]], 
+	logger = ifAuto[OptionValue["Logger"], chat["Logger"]],
 	url, 
 	headers, 
 	messages, 
+	requestAssoc, 
 	requestBody, 
 	request
 }, 
@@ -109,13 +113,15 @@ Module[{
 	
 	messages = chat["Messages"]; 
 	
-	requestBody = ExportString[<|
+	requestAssoc = <|
 		"model" -> model, 
 		"messages" -> messages, 
 		"temperature" -> temperature, 
 		If[Length[tools] > 0, "tools" -> Map[toolFunction] @ tools, Nothing], 
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
-	|>, "RawJSON", CharacterEncoding -> "UTF-8"]; 
+	|>; 
+
+	requestBody = ExportString[requestAssoc, "RawJSON", CharacterEncoding -> "UTF-8"]; 
 	
 	request = HTTPRequest[url, <|
 		Method -> "POST", 
@@ -124,13 +130,17 @@ Module[{
 		"Body" -> requestBody
 	|>]; 
 	
-	With[{$request = request}, 
+	With[{$request = request, $logger = logger, $requestAssoc = requestAssoc}, 
 		URLSubmit[$request, 
 			HandlerFunctions -> <|
+				"HeadersReceived" -> Function[$logger[<|"Body" -> $requestAssoc, "Event" -> "RequestBody"|>]], 
 				"BodyReceived" -> Function[Module[{responseBody, responseAssoc}, 
 					If[#["StatusCode"] === 200, 
 						responseBody = ExportString[#["Body"], "String"]; 
 						responseAssoc = ImportString[responseBody, "RawJSON", CharacterEncoding -> "UTF-8"]; 
+
+						$logger[<|"Body" -> responseAssoc, "Event" -> "ResponseBody"|>]; 
+
 						If[AssociationQ[responseAssoc], 
 							chat["ChatId"] = responseAssoc["id"]; 
 							chat["TotalTokens"] = responseAssoc["usage", "total_tokens"]; 
@@ -174,7 +184,7 @@ Module[{
 					]
 				]]
 			|>, 
-			HandlerFunctionsKeys -> {"StatusCode", "Body"}
+			HandlerFunctionsKeys -> {"StatusCode", "Body", "Headers"}
 		]
 	]
 ]; 

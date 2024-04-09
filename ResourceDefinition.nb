@@ -35,7 +35,7 @@ Cell["", "FileManagerTopSpacer",
  CellGroupingRules->{"SectionGrouping", 99},
  TaggingRules->{},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->25505935,ExpressionUUID->"c5879af7-85a1-5a4c-b040-558ceafe3010"],
+ CellID->25505935,ExpressionUUID->"8a4192c7-68dc-b04f-9d59-903ae274b10d"],
 
 Cell[TextData[Cell[BoxData[
  InterpretationBox[
@@ -58,7 +58,7 @@ Cell[TextData[Cell[BoxData[
     NotebookDirectory[], "Documentation"}],
   BoxID -> "FileTreePath",
   BaseStyle->{
-   "Text"}]],ExpressionUUID->"4b2dbbb3-cd9c-bd40-b9e9-3dd78538722e"]], \
+   "Text"}]],ExpressionUUID->"63a391ac-2ed5-7f40-a39d-7facfdd0e74c"]], \
 "FileManagerDirectory",
  CellMargins->{{Inherited, Inherited}, {Inherited, Inherited}},
  CellGroupingRules->{"SectionGrouping", 100},
@@ -69,7 +69,7 @@ Cell[TextData[Cell[BoxData[
       TemplateBox[{}, "FileManagerDocumentationIconTemplate"]], Background -> 
      None], Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->334950311,ExpressionUUID->"316d0780-2e86-b444-bdc1-34937458c622"],
+ CellID->334950311,ExpressionUUID->"7acad702-81b7-bd4c-acec-42a24244806b"],
 
 Cell[CellGroupData[{
 
@@ -94,7 +94,7 @@ Cell[TextData[Cell[BoxData[
     NotebookDirectory[], "Images"}],
   BoxID -> "FileTreePath",
   BaseStyle->{
-   "Text"}]],ExpressionUUID->"670298f7-3e5e-064a-b48f-8a3fd26fb6bd"]], \
+   "Text"}]],ExpressionUUID->"b622ceeb-f631-364f-ad94-2505808dea1a"]], \
 "FileManagerDirectory",
  CellMargins->{{Inherited, Inherited}, {Inherited, Inherited}},
  CellGroupingRules->{"SectionGrouping", 100},
@@ -105,7 +105,7 @@ Cell[TextData[Cell[BoxData[
       TemplateBox[{}, "FileManagerDirectoryIconTemplate"]], Background -> 
      None], Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->302925636,ExpressionUUID->"38b6c325-30e3-7249-9753-cfc08d9b6c0e"],
+ CellID->302925636,ExpressionUUID->"158c09d6-872d-304c-b49f-4aed5ad74c9d"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -129,7 +129,7 @@ Cell[BoxData[
       TemplateBox[{}, "FileManagerPNGIconTemplate"]], Background -> None], 
     Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->98964198,ExpressionUUID->"6934923b-68d9-164d-a7f7-61b031e659df"]
+ CellID->98964198,ExpressionUUID->"ffe378e2-d359-f041-b52c-00f6a8c6aca6"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -155,7 +155,7 @@ Cell[TextData[Cell[BoxData[
     NotebookDirectory[], "Kernel"}],
   BoxID -> "FileTreePath",
   BaseStyle->{
-   "Text"}]],ExpressionUUID->"444e0d9a-055e-a244-b2a1-e7d218809da4"]], \
+   "Text"}]],ExpressionUUID->"c5fe5c9f-ecac-f541-8c5e-22ac89f706bd"]], \
 "FileManagerDirectory",
  CellMargins->{{Inherited, Inherited}, {Inherited, Inherited}},
  CellGroupingRules->{"SectionGrouping", 100},
@@ -166,7 +166,7 @@ Cell[TextData[Cell[BoxData[
       TemplateBox[{}, "FileManagerKernelIconTemplate"]], Background -> None], 
     Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->111130537,ExpressionUUID->"de28c0fc-eefc-c341-8b64-1688c31dbc85"],
+ CellID->111130537,ExpressionUUID->"3d642044-ce96-b740-94ce-e1ebe8367938"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -190,7 +190,7 @@ Cell[BoxData[
       TemplateBox[{}, "FileManagerWLIconTemplate"]], Background -> None], 
     Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->207959972,ExpressionUUID->"28b2236f-c54e-cd4c-9782-068fb2ae5ad5"]
+ CellID->207959972,ExpressionUUID->"f8fa9081-94d5-324e-91d5-3d465da0566c"]
 }, Open  ]],
 
 Cell[BoxData[
@@ -215,7 +215,7 @@ Cell[BoxData[
       TemplateBox[{}, "FileManagerUnknownIconTemplate"]], Background -> None],
      Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->792711951,ExpressionUUID->"f8631d41-6b3b-214f-95c3-01bfd81996bb"],
+ CellID->792711951,ExpressionUUID->"018d29c4-6ad4-9e4f-9b73-e4a3f76f882c"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -239,7 +239,7 @@ Cell[BoxData[
       TemplateBox[{}, "FileManagerPacletInfoIconTemplate"]], Background -> 
      None], Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->299419490,ExpressionUUID->"9a39db5d-2516-8f46-8049-1ee20deb0748"],
+ CellID->299419490,ExpressionUUID->"9b8a282e-0f6e-4d4b-b0cd-005cc57fce2a"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -263,7 +263,7 @@ Cell[BoxData[
       TemplateBox[{}, "FileManagerTXTIconTemplate"]], Background -> None], 
     Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->144790226,ExpressionUUID->"bf203500-2d7c-634f-b169-161e660be6e1"],
+ CellID->144790226,ExpressionUUID->"cf574389-12de-e449-9b18-160803fe5ef9"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -287,13 +287,13 @@ Cell[BoxData[
       TemplateBox[{}, "FileManagerNBIconTemplate"]], Background -> None], 
     Inherited}, {Inherited, Inherited}},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->393161409,ExpressionUUID->"9954b8a2-bad7-c445-968b-e17d97ffad75"],
+ CellID->393161409,ExpressionUUID->"df16b39a-c6f5-b943-ab3d-ef538b4dafaa"],
 
 Cell["", "FileManagerBottomSpacer",
  CellGroupingRules->{"SectionGrouping", 100},
  TaggingRules->{},
  CellTags->{"FileManagerCell", "FileManager-PacletFiles"},
- CellID->28626834,ExpressionUUID->"c667a4eb-840d-5d4f-a4fa-06d51570c94f"]
+ CellID->28626834,ExpressionUUID->"98ca0679-1b0e-7047-942c-674f4d9c4128"]
 }, Open  ]]
 }, Open  ]],
 
@@ -2781,7 +2781,7 @@ Cell["Additional information about limitations, issues, etc.", "Text",
 }, Open  ]]
 },
 WindowSize->{889.5, 738},
-WindowMargins->{{Automatic, 457.5}, {89.25, Automatic}},
+WindowMargins->{{Automatic, 41.25}, {98.25, Automatic}},
 WindowTitle->"GPTLink | Definition Notebook",
 DockedCells->{
   Cell[
@@ -2842,27 +2842,27 @@ Fu6DuJJG2H9mK2QZ3X1Y8rjKVdsLU11Qbnfn/Mae/TiO1RZHs2bny+6Vwq5Sfi8TnHKi+1+K4NOh"]\
   "AutoUpdate" -> True, 
   "PacletBuildData" -> {
    "LastBuiltArchive" -> 
-    "C:\\Users\\Kirill\\Projects\\GPTLink\\build\\KirillBelov__GPTLink-1.0.2.\
+    "C:\\Users\\Kirill\\Projects\\GPTLink\\build\\KirillBelov__GPTLink-1.0.3.\
 paclet", "FileHashes" -> 
     ByteArray[{56, 67, 58, 120, 156, 115, 228, 212, 13, 86, 115, 201, 79, 46, 
       205, 77, 205, 43, 73, 44, 201, 204, 207, 211, 119, 205, 75, 207, 201, 
       44, 206, 208, 247, 204, 75, 73, 173, 208, 47, 78, 77, 7, 73, 21, 199, 
       27, 58, 50, 233, 6, 179, 5, 231, 151, 22, 37, 167, 22, 179, 248, 229, 
-      231, 165, 2, 185, 33, 137, 69, 233, 169, 37, 62, 238, 1, 43, 214, 60, 
-      57, 213, 159, 169, 27, 172, 65, 140, 89, 122, 233, 169, 121, 120, 76, 
-      99, 253, 48, 227, 209, 2, 201, 103, 37, 186, 193, 218, 216, 77, 11, 46, 
-      72, 205, 201, 33, 193, 121, 106, 147, 143, 46, 19, 124, 186, 0, 104, 
-      160, 46, 209, 6, 18, 237, 70, 113, 207, 220, 196, 244, 212, 98, 253, 
-      228, 140, 196, 146, 244, 130, 18, 221, 156, 252, 244, 124, 189, 130, 
-      188, 116, 36, 205, 62, 211, 123, 79, 172, 251, 179, 152, 215, 9, 161, 
-      31, 33, 34, 232, 157, 90, 148, 151, 154, 163, 239, 30, 16, 226, 147, 
-      153, 151, 173, 87, 158, 131, 172, 115, 119, 142, 104, 249, 137, 178, 
-      103, 121, 8, 157, 8, 17, 222, 128, 196, 228, 156, 212, 18, 207, 188, 
-      180, 124, 52, 93, 70, 109, 156, 147, 246, 76, 152, 103, 138, 208, 133, 
-      16, 17, 132, 232, 242, 77, 204, 203, 76, 75, 45, 46, 65, 213, 137, 238, 
-      205, 42, 219, 21, 91, 98, 179, 26, 226, 116, 131, 57, 131, 92, 29, 93, 
-      124, 93, 245, 114, 83, 144, 45, 10, 152, 237, 87, 187, 245, 8, 127, 46, 
-      66, 7, 76, 4, 0, 70, 128, 221, 184}]}},
+      231, 165, 2, 185, 33, 137, 69, 233, 169, 37, 62, 239, 36, 91, 24, 163, 
+      149, 141, 194, 117, 131, 53, 136, 49, 75, 47, 61, 53, 15, 143, 105, 172,
+       31, 102, 60, 90, 32, 249, 172, 68, 55, 88, 27, 187, 105, 193, 5, 169, 
+      57, 57, 36, 56, 79, 84, 251, 228, 239, 134, 111, 205, 185, 186, 193, 
+      186, 68, 27, 72, 180, 27, 197, 61, 115, 19, 211, 83, 139, 245, 147, 51, 
+      18, 75, 210, 11, 74, 116, 115, 242, 211, 243, 245, 10, 242, 210, 145, 
+      52, 251, 76, 239, 61, 177, 238, 207, 98, 94, 39, 132, 126, 132, 136, 
+      160, 119, 106, 81, 94, 106, 142, 190, 123, 64, 136, 79, 102, 94, 182, 
+      94, 121, 14, 178, 206, 25, 91, 58, 202, 61, 5, 83, 234, 16, 58, 17, 34, 
+      188, 1, 137, 201, 57, 169, 37, 158, 121, 105, 249, 104, 186, 78, 112, 
+      57, 176, 252, 229, 254, 35, 132, 208, 133, 16, 17, 132, 232, 242, 77, 
+      204, 203, 76, 75, 45, 46, 65, 213, 137, 238, 205, 93, 45, 94, 27, 99, 
+      109, 204, 124, 116, 131, 57, 131, 92, 29, 93, 124, 93, 245, 114, 83, 
+      144, 45, 10, 152, 237, 87, 187, 245, 8, 127, 46, 66, 7, 76, 4, 0, 56, 
+      45, 217, 138}]}},
 CreateCellID->True,
 DynamicEvaluationTimeout->60,
 TrackCellChangeTimes->False,
