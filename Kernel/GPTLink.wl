@@ -49,6 +49,8 @@ CreateType[GPTChatObject, {
 	"MaxTokens" -> 70000, 
 	"TotalTokens" -> 0, 
 	"Tools" -> {}, 
+	"ToolHandler" -> defaultToolHandler,
+	"ToolFunction" -> defaultToolFunction,
 	"ToolChoice" -> "auto", 
 	"Messages" -> {}, 
 	"Logger" -> None
@@ -78,7 +80,9 @@ Options[GPTChatCompleteAsync] = {
 	"MaxTokens" -> Automatic, 
 	"Tools" -> Automatic, 
 	"ToolChoice" -> Automatic, 
-	"Logger" -> Automatic
+	"ToolFunction" -> Automatic,
+	"ToolHandler" -> Automatic,
+	"Logger" -> Automatic,
 }; 
 
 
@@ -94,9 +98,11 @@ Module[{
 	model = ifAuto[OptionValue["Model"], chat["Model"]], 
 	temperature = ifAuto[OptionValue["Temperature"], chat["Temperature"]], 
 	tools = ifAuto[OptionValue["Tools"], chat["Tools"]], 
+	toolFunction = ifAuto[OptionValue["ToolFunction"], chat["ToolFunction"]], 
 	toolChoice = ifAuto[OptionValue["ToolChoice"], chat["ToolChoice"]], 
 	maxTokens = ifAuto[OptionValue["MaxTokens"], chat["MaxTokens"]], 
 	logger = ifAuto[OptionValue["Logger"], chat["Logger"]],
+	toolHandler = ifAuto[OptionValue["ToolHandler"], chat["ToolHandler"]],
 	url, 
 	headers, 
 	messages, 
@@ -117,7 +123,7 @@ Module[{
 		"model" -> model, 
 		"messages" -> messages, 
 		"temperature" -> temperature, 
-		If[Length[tools] > 0, "tools" -> Map[toolFunction] @ tools, Nothing], 
+		"tools" -> toolFunction[tools], 
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
 	|>; 
 
@@ -148,13 +154,9 @@ Module[{
 
 							If[KeyExistsQ[chat["Messages"][[-1]], "tool_calls"], 
 								Module[{
-									$func = ToExpression[chat["Messages"][[-1, "tool_calls", 1, "function", "name"]]], 
-									$result
+									$result = toolHandler[chat["Messages"][[-1]]]
 								}, 
-									$result = Apply[$func] @ Values @ ImportString[ImportString[
-										chat["Messages"][[-1, "tool_calls", 1, "function", "arguments"]], 
-										"Text"], "RawJSON", CharacterEncoding -> "UTF-8"
-									]; 
+								
 
 									If[StringQ[$result], 
 										Append[chat, <|
@@ -229,8 +231,15 @@ ifAuto[Automatic, value_] := value;
 
 ifAuto[value_, _] := value; 
 
+defaultToolHandler[message_] := Module[{func = message[["tool_calls", 1, "function", "name"]] // ToExpression},
+	Apply[$func] @ Values @ ImportString[ImportString[
+										message["Messages"][["tool_calls", 1, "function", "arguments"]], 
+										"Text"], "RawJSON", CharacterEncoding -> "UTF-8"
+									]
+]
 
-toolFunction[function_Symbol] := 
+
+defaultToolFunction[function_Symbol] := 
 <|
 	"type" -> "function", 
 	"function" -> <|
@@ -253,8 +262,9 @@ toolFunction[function_Symbol] :=
 	|>
 |>; 
 
+defaultToolFunction[list_List] := If[Length[list] > 0, Map[defaultToolFunction] @ tools, Nothing]
 
-toolFunction[assoc_Association?AssociationQ] := 
+defaultToolFunction[assoc_Association?AssociationQ] := 
 assoc; 
 
 
