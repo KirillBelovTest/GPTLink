@@ -82,7 +82,7 @@ Options[GPTChatCompleteAsync] = {
 	"ToolChoice" -> Automatic, 
 	"ToolFunction" -> Automatic,
 	"ToolHandler" -> Automatic,
-	"Logger" -> Automatic,
+	"Logger" -> Automatic
 }; 
 
 
