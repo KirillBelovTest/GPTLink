@@ -61,6 +61,7 @@ GPTChatObject[system_String, opts: OptionsPattern[]] :=
 With[{chat = GPTChatObject[opts]}, 
 	chat["Messages"] = Append[chat["Messages"], <|
 		"role" -> "system", 
+		"date" -> Now,
 		"content" -> system
 	|>]; 
 	chat
@@ -121,7 +122,7 @@ Module[{
 	
 	requestAssoc = <|
 		"model" -> model, 
-		"messages" -> messages, 
+		"messages" -> sanitaze[messages], 
 		"temperature" -> temperature, 
 		"tools" -> toolFunction[tools], 
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
@@ -150,7 +151,7 @@ Module[{
 						If[AssociationQ[responseAssoc], 
 							chat["ChatId"] = responseAssoc["id"]; 
 							chat["TotalTokens"] = responseAssoc["usage", "total_tokens"]; 
-							Append[chat, responseAssoc[["choices", 1, "message"]]]; 
+							Append[chat, Join[responseAssoc[["choices", 1, "message"]], <|"date" -> Now|>] ]; 
 
 							If[KeyExistsQ[chat["Messages"][[-1]], "tool_calls"], 
 								Module[{
@@ -163,7 +164,8 @@ Module[{
 											"role" -> "tool", 
 											"content" -> $result, 
 											"name" -> chat["Messages"][[-1, "tool_calls", 1, "function", "name"]], 
-											"tool_call_id" -> chat["Messages"][[-1, "tool_calls", 1, "id"]]
+											"tool_call_id" -> chat["Messages"][[-1, "tool_calls", 1, "id"]],
+											"date" -> Now
 										|>]; 
 
 										If[secondCall === GPTChatComplete, 
@@ -194,7 +196,7 @@ Module[{
 
 GPTChatCompleteAsync[chat_GPTChatObject, prompt_String, callback: _Symbol | _Function, 
 	secondCall: GPTChatComplete | GPTChatCompleteAsync: GPTChatCompleteAsync, opts: OptionsPattern[]] := (
-	Append[chat, <|"role" -> "user", "content" -> prompt|>]; 
+	Append[chat, <|"role" -> "user", "content" -> prompt, "date"->Now|>]; 
 	GPTChatCompleteAsync[chat, callback, secondCall, opts]
 ); 
 
@@ -202,7 +204,7 @@ GPTChatCompleteAsync[chat_GPTChatObject, prompt_String, callback: _Symbol | _Fun
 GPTChatCompleteAsync[prompt_String, callback: _Symbol | _Function, 
 	secondCall: GPTChatComplete | GPTChatCompleteAsync: GPTChatCompleteAsync, opts: OptionsPattern[]] := 
 With[{chat = GPTChatObject[]}, 
-	Append[chat, <|"role" -> "user", "content" -> prompt|>]; 
+	Append[chat, <|"role" -> "user", "content" -> prompt, "date"->Now|>]; 
 	GPTChatCompleteAsync[chat, callback, secondCall, opts]
 ]; 
 
@@ -282,6 +284,8 @@ assoc;
 
 functionChoice[_] := 
 "none"; 
+
+sanitaze[list_List] :=  Function[message, KeyDrop[message, "date"] ] /@ list 
 
 
 (* ::Section:: *)
