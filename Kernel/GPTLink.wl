@@ -124,7 +124,7 @@ Module[{
 		"model" -> model, 
 		"messages" -> sanitaze[messages], 
 		"temperature" -> temperature, 
-		"tools" -> toolFunction[tools], 
+		If[# === Nothing, Nothing, "tools" -> #] &@ toolFunction[tools], 
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
 	|>; 
 
