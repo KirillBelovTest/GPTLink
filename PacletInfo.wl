@@ -3,7 +3,7 @@ PacletObject[
     "Name" -> "KirillBelov/GPTLink",
     "Description" -> "Client to ChatGPT link APIs",
     "Creator" -> "Kirill Belov",
-    "Version" -> "1.0.4",
+    "Version" -> "1.0.5",
     "WolframVersion" -> "14+",
     "PublisherID" -> "KirillBelov",
     "License" -> "MIT",

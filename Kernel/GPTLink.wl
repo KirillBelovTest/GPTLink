@@ -40,6 +40,9 @@ $directory = ParentDirectory[DirectoryName[$InputFileName]];
 $icon = Import[FileNameJoin[{$directory, "Images", "chatgpt-logo.png"}]]; 
 
 
+promptPattern = _String | _Image | {_String, _Image} | {_String, _Graphics} | {_String, Legended[_Graphics, ___]}; 
+
+
 CreateType[GPTChatObject, {
 	"Icon" -> $icon, 
 	"Endpoint" -> "https://api.openai.com", 
@@ -232,17 +235,17 @@ Module[{
 ]; 
 
 
-GPTChatCompleteAsync[chat_GPTChatObject, prompt_String, callback: _Symbol | _Function, 
+GPTChatCompleteAsync[chat_GPTChatObject, prompt: promptPattern, callback: _Symbol | _Function, 
 	secondCall: GPTChatComplete | GPTChatCompleteAsync: GPTChatCompleteAsync, opts: OptionsPattern[]] := (
-	Append[chat, <|"role" -> "user", "content" -> prompt, "date"->Now|>]; 
+	Append[chat, prompt]; 
 	GPTChatCompleteAsync[chat, callback, secondCall, opts]
 ); 
 
 
-GPTChatCompleteAsync[prompt_String, callback: _Symbol | _Function, 
+GPTChatCompleteAsync[prompt: promptPattern, callback: _Symbol | _Function, 
 	secondCall: GPTChatComplete | GPTChatCompleteAsync: GPTChatCompleteAsync, opts: OptionsPattern[]] := 
 With[{chat = GPTChatObject[]}, 
-	Append[chat, <|"role" -> "user", "content" -> prompt, "date"->Now|>]; 
+	Append[chat, prompt]; 
 	GPTChatCompleteAsync[chat, callback, secondCall, opts]
 ]; 
 
@@ -254,11 +257,11 @@ GPTChatComplete[chat_GPTChatObject, opts: OptionsPattern[]] :=
 (TaskWait[GPTChatCompleteAsync[chat, Identity, GPTChatComplete, opts]]; chat); 
 
 
-GPTChatComplete[chat_GPTChatObject, prompt_String, opts: OptionsPattern[]] := 
+GPTChatComplete[chat_GPTChatObject, prompt: promptPattern, opts: OptionsPattern[]] := 
 (TaskWait[GPTChatCompleteAsync[chat, prompt, Identity, GPTChatComplete, opts]]; chat); 
 
 
-GPTChatComplete[prompt_String, opts: OptionsPattern[]] := 
+GPTChatComplete[prompt: promptPattern, opts: OptionsPattern[]] := 
 With[{chat = GPTChatObject[]}, TaskWait[GPTChatCompleteAsync[chat, prompt, Identity, GPTChatComplete, opts]]; chat]; 
 
 
