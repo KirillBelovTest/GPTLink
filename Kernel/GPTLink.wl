@@ -23,7 +23,8 @@ GPTChatCompleteAsync[chat, prompt, callback] complete chat using given prompt in
 
 
 GPTChatObject::usage = 
-"GPTChatObject[] symbolic chat representation in Wolfram Language."; 
+"GPTChatObject[] symbolic chat representation in Wolfram Language.
+GPTChatObject[\"system\"] symbolic chat representation with system prompt in Wolfram Language."; 
 
 
 Begin["`Private`"];
@@ -69,7 +70,44 @@ With[{chat = GPTChatObject[opts]},
 
 
 GPTChatObject /: Append[chat_GPTChatObject, message_Association?AssociationQ] := 
-(chat["Messages"] = Append[chat["Messages"], message]; chat); 
+(chat["Messages"] = Append[chat["Messages"], Append[message, "date" -> Now]]; chat); 
+
+
+GPTChatObject /: Append[chat_GPTChatObject, message_String?StringQ] := 
+Append[chat, <|"role" -> "user", "content" -> message|>]; 
+
+
+GPTChatObject /: Append[chat_GPTChatObject, image_Image?ImageQ] := 
+With[{imageBase64 = BaseEncode[ExportByteArray[image, "JPEG"], "Base64"]}, 
+	Append[chat, <|"role" -> "user", "content" -> {
+		<|
+			"type" -> "image_url", 
+			"image_url" -> <|
+				"url" -> StringTemplate["data:image/jpeg;base64,``"][imageBase64]
+			|>
+		|>
+	}|>]
+]; 
+
+
+GPTChatObject /: Append[chat_GPTChatObject, {text_String?StringQ, image_Image?ImageQ}] := 
+With[{imageBase64 = BaseEncode[ExportByteArray[image, "JPEG"], "Base64"]}, 
+	Append[chat, <|"role" -> "user", "content" -> {
+		<|"type" -> "text", "text" -> text|>, 
+		<|
+			"type" -> "image_url", 
+			"image_url" -> <|
+				"url" -> StringTemplate["data:image/jpeg;base64,``"][imageBase64]
+			|>
+		|>
+	}|>]
+]; 
+
+
+GPTChatObject /: Append[chat_GPTChatObject, {text_String?StringQ, graphics: _Graphics | Legended[_Graphics, ___]}] := 
+With[{image = Rasterize[graphics]}, 
+	Append[chat, {text, image}]
+]; 
 
 
 Options[GPTChatCompleteAsync] = {
