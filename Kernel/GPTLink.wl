@@ -169,6 +169,8 @@ Module[{
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
 	|>; 
 
+	Echo[requestAssoc];
+
 	requestBody = ExportString[requestAssoc, "RawJSON", CharacterEncoding -> "UTF-8"]; 
 	
 	request = HTTPRequest[url, <|
@@ -196,16 +198,17 @@ Module[{
 
 							If[KeyExistsQ[chat["Messages"][[-1]], "tool_calls"], 
 								Module[{
-									$result = toolHandler[chat["Messages"][[-1]]]
+									$result = toolHandler[chat["Messages"][[-1]]],
+									msg = chat["Messages"][[-1]]
 								}, 
 								
-
-									If[StringQ[$result], 
+								  Do[
+									If[StringQ[$result[[i]]], 
 										Append[chat, <|
 											"role" -> "tool", 
-											"content" -> $result, 
-											"name" -> chat["Messages"][[-1, "tool_calls", 1, "function", "name"]], 
-											"tool_call_id" -> chat["Messages"][[-1, "tool_calls", 1, "id"]],
+											"content" -> $result[[i]], 
+											"name" -> msg[["tool_calls", i, "function", "name"]], 
+											"tool_call_id" -> msg[["tool_calls", i, "id"]],
 											"date" -> Now
 										|>]; 
 
@@ -217,6 +220,7 @@ Module[{
 									(*Else*)
 										Message[GPTChatCompleteAsync::err, $result]; $Failed		
 									];
+								  , {i, Length[$result]}];
 								], 
 								callback[chat], 
 							(*Else*)
@@ -227,7 +231,7 @@ Module[{
 						], 
 						$Failed
 					]
-				]]
+				] ]
 			|>, 
 			HandlerFunctionsKeys -> {"StatusCode", "Body", "Headers"}
 		]
@@ -274,12 +278,12 @@ ifAuto[Automatic, value_] := value;
 
 ifAuto[value_, _] := value; 
 
-defaultToolHandler[message_] := Module[{func = message[["tool_calls", 1, "function", "name"]] // ToExpression},
+defaultToolHandler[message_] := Table[Module[{func = message[["tool_calls", i, "function", "name"]] // ToExpression},
 	Apply[$func] @ Values @ ImportString[ImportString[
 										message["Messages"][["tool_calls", 1, "function", "arguments"]], 
 										"Text"], "RawJSON", CharacterEncoding -> "UTF-8"
 									]
-]
+], {i, Length[message[["tool_calls"]]]}]
 
 
 defaultToolFunction[function_Symbol] := 
