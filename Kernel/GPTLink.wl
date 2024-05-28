@@ -169,7 +169,7 @@ Module[{
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
 	|>; 
 
-	Echo[requestAssoc];
+
 
 	requestBody = ExportString[requestAssoc, "RawJSON", CharacterEncoding -> "UTF-8"]; 
 	
@@ -183,7 +183,7 @@ Module[{
 	With[{$request = request, $logger = logger, $requestAssoc = requestAssoc}, 
 		URLSubmit[$request, 
 			HandlerFunctions -> <|
-				"HeadersReceived" -> Function[$logger[<|"Body" -> $requestAssoc, "Event" -> "RequestBody"|>]], 
+				"HeadersReceived" -> Function[$logger[<|"Body" -> $requestAssoc, "Event" -> "RequestBody"|>] ], 
 				"BodyReceived" -> Function[Module[{responseBody, responseAssoc}, 
 					If[#["StatusCode"] === 200, 
 						responseBody = ExportString[#["Body"], "String"]; 
@@ -198,31 +198,45 @@ Module[{
 
 							If[KeyExistsQ[chat["Messages"][[-1]], "tool_calls"], 
 								Module[{
-									$result = toolHandler[chat["Messages"][[-1]]],
+									$cbk,
 									msg = chat["Messages"][[-1]]
 								}, 
 								
-								  Do[
-									If[StringQ[$result[[i]]], 
-										Append[chat, <|
-											"role" -> "tool", 
-											"content" -> $result[[i]], 
-											"name" -> msg[["tool_calls", i, "function", "name"]], 
-											"tool_call_id" -> msg[["tool_calls", i, "id"]],
-											"date" -> Now
-										|>]; 
+									
+									$cbk = Function[$result,
+									  Do[
+										If[StringQ[$result[[ i]]], 
+											Append[chat, <|
+												"role" -> "tool", 
+												"content" -> $result[[ i]], 
+												"name" -> msg[["tool_calls", i, "function", "name"]], 
+												"tool_call_id" -> msg[["tool_calls", i, "id"]],
+												"date" -> Now
+											|>]; 
 
-										If[secondCall === GPTChatComplete, 
-											secondCall[chat, opts], 
+										, 
 										(*Else*)
+											Message[GPTChatCompleteAsync::err, $result]; $Failed		
+										];
+									  , {i, Length[$result ]}];
+
+									  If[secondCall === GPTChatComplete, 
+											secondCall[chat, opts], 
+											(*Else*)
 											secondCall[chat, callback, secondCall, opts]
-										], 
-									(*Else*)
-										Message[GPTChatCompleteAsync::err, $result]; $Failed		
+									  ];
 									];
-								  , {i, Length[$result]}];
-								], 
-								callback[chat], 
+									
+									
+								
+									toolHandler[chat["Messages"][[-1]], $cbk];
+								];
+								callback[chat];
+								,
+								(*Else*)
+								callback[chat];
+							
+							, 
 							(*Else*)
 								Message[GPTChatCompleteAsync::err, responseAssoc]; $Failed
 							], 
@@ -278,12 +292,12 @@ ifAuto[Automatic, value_] := value;
 
 ifAuto[value_, _] := value; 
 
-defaultToolHandler[message_] := Table[Module[{func = message[["tool_calls", i, "function", "name"]] // ToExpression},
+defaultToolHandler[message_, cbk_] := cbk @ (Table[Module[{func = message[["tool_calls", i, "function", "name"]] // ToExpression},
 	Apply[$func] @ Values @ ImportString[ImportString[
 										message["Messages"][["tool_calls", 1, "function", "arguments"]], 
 										"Text"], "RawJSON", CharacterEncoding -> "UTF-8"
 									]
-], {i, Length[message[["tool_calls"]]]}]
+], {i, Length[message[["tool_calls"]]]}])
 
 
 defaultToolFunction[function_Symbol] := 
