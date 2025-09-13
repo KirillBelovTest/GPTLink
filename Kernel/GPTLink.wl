@@ -7,9 +7,6 @@
 BeginPackage["KirillBelov`GPTLink`", {"KirillBelov`Objects`"}];
 
 
-ClearAll["`*"]; 
-
-
 GPTChatComplete::usage = 
 "GPTChatComplete[chat] complete given chat. 
 GPTChatCompleteAsync[prompt] complete given prompt. 
@@ -34,17 +31,10 @@ Begin["`Private`"];
 (*Definitions*)
 
 
-$directory = ParentDirectory[DirectoryName[$InputFileName]]; 
-
-
-$icon = Import[FileNameJoin[{$directory, "Images", "chatgpt-logo.png"}]]; 
-
-
 promptPattern = _String | _Image | {_String, _Image} | {_String, _Graphics} | {_String, Legended[_Graphics, ___]}; 
 
 
 CreateType[GPTChatObject, {
-	"Icon" -> $icon, 
 	"Endpoint" -> "https://api.openai.com", 
 	"Temperature" -> 0.7, 
 	"User", 
@@ -186,8 +176,8 @@ Module[{
 				"HeadersReceived" -> Function[$logger[<|"Body" -> $requestAssoc, "Event" -> "RequestBody"|>] ], 
 				"BodyReceived" -> Function[Module[{responseBody, responseAssoc}, 
 					If[#["StatusCode"] === 200, 
-						responseBody = ExportString[#["Body"], "String"]; 
-						responseAssoc = ImportString[responseBody, "RawJSON", CharacterEncoding -> "UTF-8"]; 
+						(* responseBody = ExportString[#["Body"], "String"];  *)
+						responseAssoc = ImportByteArray[#["BodyByteArray"], "RawJSON", CharacterEncoding -> "UTF-8"]; 
 
 						$logger[<|"Body" -> responseAssoc, "Event" -> "ResponseBody"|>]; 
 
@@ -247,7 +237,7 @@ Module[{
 					]
 				] ]
 			|>, 
-			HandlerFunctionsKeys -> {"StatusCode", "Body", "Headers"}
+			HandlerFunctionsKeys -> {"StatusCode", "BodyByteArray", "Headers"}
 		]
 	]
 ]; 
@@ -292,12 +282,13 @@ ifAuto[Automatic, value_] := value;
 
 ifAuto[value_, _] := value; 
 
-defaultToolHandler[message_, cbk_] := cbk @ (Table[Module[{func = message[["tool_calls", i, "function", "name"]] // ToExpression},
-	Apply[$func] @ Values @ ImportString[ImportString[
-										message["Messages"][["tool_calls", 1, "function", "arguments"]], 
-										"Text"], "RawJSON", CharacterEncoding -> "UTF-8"
+defaultToolHandler[message_, cbk_] := With[{},
+cbk @ (Table[Module[{func = message[["tool_calls", i, "function", "name"]] // ToExpression},
+	Apply[func] @ Values @ ImportByteArray[StringToByteArray @
+										message[["tool_calls", i, "function", "arguments"]], "RawJSON", CharacterEncoding -> "UTF-8"
 									]
 ], {i, Length[message[["tool_calls"]]]}])
+]
 
 
 defaultToolFunction[function_Symbol] := 
@@ -323,7 +314,7 @@ defaultToolFunction[function_Symbol] :=
 	|>
 |>; 
 
-defaultToolFunction[list_List] := If[Length[list] > 0, Map[defaultToolFunction] @ tools, Nothing]
+defaultToolFunction[list_List] := If[Length[list] > 0, Map[defaultToolFunction] @ list, Nothing]
 
 defaultToolFunction[assoc_Association?AssociationQ] := 
 assoc; 
