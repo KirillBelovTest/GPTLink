@@ -90,7 +90,7 @@ wolframAlpha::usage =
 "wolframAlpha[query] returns answer from WolframAlpha using query."; 
 
 wolframAlpha[query_String] := 
-WolframAlpha[TextTranslation[query, "English"], "ShortAnswer"]
+WolframAlpha[query, "ShortAnswer"]
 ```
 
 Now let's create a chat + plugin and let's make request to OpenAI:
