@@ -7,9 +7,6 @@
 BeginPackage["KirillBelov`GPTLink`", {"KirillBelov`Objects`"}];
 
 
-ClearAll["`*"]; 
-
-
 GPTChatComplete::usage = 
 "GPTChatComplete[chat] complete given chat. 
 GPTChatCompleteAsync[prompt] complete given prompt. 
@@ -34,17 +31,10 @@ Begin["`Private`"];
 (*Definitions*)
 
 
-$directory = ParentDirectory[DirectoryName[$InputFileName]]; 
-
-
-$icon = Import[FileNameJoin[{$directory, "Images", "chatgpt-logo.png"}]]; 
-
-
 promptPattern = _String | _Image | {_String, _Image} | {_String, _Graphics} | {_String, Legended[_Graphics, ___]}; 
 
 
 CreateType[GPTChatObject, {
-	"Icon" -> $icon, 
 	"Endpoint" -> "https://api.openai.com", 
 	"Temperature" -> 0.7, 
 	"User", 
@@ -169,6 +159,8 @@ Module[{
 		If[Length[tools] > 0, "tool_choice" -> functionChoice[toolChoice], Nothing]
 	|>; 
 
+
+
 	requestBody = ExportString[requestAssoc, "RawJSON", CharacterEncoding -> "UTF-8"]; 
 	
 	request = HTTPRequest[url, <|
@@ -181,11 +173,11 @@ Module[{
 	With[{$request = request, $logger = logger, $requestAssoc = requestAssoc}, 
 		URLSubmit[$request, 
 			HandlerFunctions -> <|
-				"HeadersReceived" -> Function[$logger[<|"Body" -> $requestAssoc, "Event" -> "RequestBody"|>]], 
+				"HeadersReceived" -> Function[$logger[<|"Body" -> $requestAssoc, "Event" -> "RequestBody"|>] ], 
 				"BodyReceived" -> Function[Module[{responseBody, responseAssoc}, 
 					If[#["StatusCode"] === 200, 
-						responseBody = ExportString[#["Body"], "String"]; 
-						responseAssoc = ImportString[responseBody, "RawJSON", CharacterEncoding -> "UTF-8"]; 
+						(* responseBody = ExportString[#["Body"], "String"];  *)
+						responseAssoc = ImportByteArray[#["BodyByteArray"], "RawJSON", CharacterEncoding -> "UTF-8"]; 
 
 						$logger[<|"Body" -> responseAssoc, "Event" -> "ResponseBody"|>]; 
 
@@ -196,29 +188,45 @@ Module[{
 
 							If[KeyExistsQ[chat["Messages"][[-1]], "tool_calls"], 
 								Module[{
-									$result = toolHandler[chat["Messages"][[-1]]]
+									$cbk,
+									msg = chat["Messages"][[-1]]
 								}, 
 								
+									
+									$cbk = Function[$result,
+									  Do[
+										If[StringQ[$result[[ i]]], 
+											Append[chat, <|
+												"role" -> "tool", 
+												"content" -> $result[[ i]], 
+												"name" -> msg[["tool_calls", i, "function", "name"]], 
+												"tool_call_id" -> msg[["tool_calls", i, "id"]],
+												"date" -> Now
+											|>]; 
 
-									If[StringQ[$result], 
-										Append[chat, <|
-											"role" -> "tool", 
-											"content" -> $result, 
-											"name" -> chat["Messages"][[-1, "tool_calls", 1, "function", "name"]], 
-											"tool_call_id" -> chat["Messages"][[-1, "tool_calls", 1, "id"]],
-											"date" -> Now
-										|>]; 
-
-										If[secondCall === GPTChatComplete, 
-											secondCall[chat, opts], 
+										, 
 										(*Else*)
+											Message[GPTChatCompleteAsync::err, $result]; $Failed		
+										];
+									  , {i, Length[$result ]}];
+
+									  If[secondCall === GPTChatComplete, 
+											secondCall[chat, opts], 
+											(*Else*)
 											secondCall[chat, callback, secondCall, opts]
-										], 
-									(*Else*)
-										Message[GPTChatCompleteAsync::err, $result]; $Failed		
+									  ];
 									];
-								], 
-								callback[chat], 
+									
+									
+								
+									toolHandler[chat["Messages"][[-1]], $cbk];
+								];
+								callback[chat];
+								,
+								(*Else*)
+								callback[chat];
+							
+							, 
 							(*Else*)
 								Message[GPTChatCompleteAsync::err, responseAssoc]; $Failed
 							], 
@@ -227,9 +235,9 @@ Module[{
 						], 
 						$Failed
 					]
-				]]
+				] ]
 			|>, 
-			HandlerFunctionsKeys -> {"StatusCode", "Body", "Headers"}
+			HandlerFunctionsKeys -> {"StatusCode", "BodyByteArray", "Headers"}
 		]
 	]
 ]; 
@@ -274,11 +282,12 @@ ifAuto[Automatic, value_] := value;
 
 ifAuto[value_, _] := value; 
 
-defaultToolHandler[message_] := Module[{func = message[["tool_calls", 1, "function", "name"]] // ToExpression},
-	Apply[$func] @ Values @ ImportString[ImportString[
-										message["Messages"][["tool_calls", 1, "function", "arguments"]], 
-										"Text"], "RawJSON", CharacterEncoding -> "UTF-8"
+defaultToolHandler[message_, cbk_] := With[{},
+cbk @ (Table[Module[{func = message[["tool_calls", i, "function", "name"]] // ToExpression},
+	Apply[func] @ Values @ ImportByteArray[StringToByteArray @
+										message[["tool_calls", i, "function", "arguments"]], "RawJSON", CharacterEncoding -> "UTF-8"
 									]
+], {i, Length[message[["tool_calls"]]]}])
 ]
 
 
@@ -305,7 +314,7 @@ defaultToolFunction[function_Symbol] :=
 	|>
 |>; 
 
-defaultToolFunction[list_List] := If[Length[list] > 0, Map[defaultToolFunction] @ tools, Nothing]
+defaultToolFunction[list_List] := If[Length[list] > 0, Map[defaultToolFunction] @ list, Nothing]
 
 defaultToolFunction[assoc_Association?AssociationQ] := 
 assoc; 
